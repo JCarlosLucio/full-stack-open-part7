@@ -6,14 +6,18 @@ import Notification from './components/Notification';
 import Togglable from './components/Togglable';
 import blogService from './services/blogs';
 import loginService from './services/login';
+import { setNotification } from './reducers/notificationReducer';
+import { useDispatch, useSelector } from 'react-redux';
 
 const App = () => {
   const [blogs, setBlogs] = useState([]);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [user, setUser] = useState(null);
-  const [notification, setNotification] = useState(null);
   const blogFormRef = useRef();
+
+  const notification = useSelector((state) => state.notification);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     blogService.getAll().then((blogs) => setBlogs(blogs));
@@ -39,19 +43,17 @@ const App = () => {
       setUser(user);
       setUsername('');
       setPassword('');
-      setNotification({
-        type: 'success',
-        message: `Welcome back, ${user.name}!`,
-      });
-      setTimeout(() => {
-        setNotification(null);
-      }, 5000);
+      dispatch(
+        setNotification({
+          alert: 'success',
+          message: `Welcome back, ${user.name}!`,
+        })
+      );
     } catch (error) {
       console.error(error.response.data.error);
-      setNotification({ type: 'error', message: error.response.data.error });
-      setTimeout(() => {
-        setNotification(null);
-      }, 5000);
+      dispatch(
+        setNotification({ alert: 'error', message: error.response.data.error })
+      );
     }
   };
 
@@ -60,19 +62,17 @@ const App = () => {
       const savedBlog = await blogService.create(blogObject);
       setBlogs([...blogs, savedBlog]);
       blogFormRef.current.toggleVisibility();
-      setNotification({
-        type: 'success',
-        message: `a new blog ${blogObject.title} by ${blogObject.author} added`,
-      });
-      setTimeout(() => {
-        setNotification(null);
-      }, 5000);
+      dispatch(
+        setNotification({
+          alert: 'success',
+          message: `a new blog ${blogObject.title} by ${blogObject.author} added`,
+        })
+      );
     } catch (error) {
       console.error(error);
-      setNotification({ type: 'error', message: error.response.data.error });
-      setTimeout(() => {
-        setNotification(null);
-      }, 5000);
+      dispatch(
+        setNotification({ alert: 'error', message: error.response.data.error })
+      );
     }
   };
 
@@ -93,10 +93,9 @@ const App = () => {
       );
     } catch (error) {
       console.error(error);
-      setNotification({ type: 'error', message: error.response.data.error });
-      setTimeout(() => {
-        setNotification(null);
-      }, 5000);
+      dispatch(
+        setNotification({ alert: 'error', message: error.response.data.error })
+      );
     }
   };
 
@@ -104,13 +103,12 @@ const App = () => {
     window.localStorage.removeItem('loggedBloglistUser');
     blogService.setToken(null);
     setUser(null);
-    setNotification({
-      type: 'success',
-      message: 'You have been logged out successfully',
-    });
-    setTimeout(() => {
-      setNotification(null);
-    }, 5000);
+    dispatch(
+      setNotification({
+        alert: 'success',
+        message: 'You have been logged out successfully',
+      })
+    );
   };
 
   const removeBlog = async (id) => {
@@ -122,19 +120,20 @@ const App = () => {
       try {
         await blogService.remove(id);
         setBlogs(blogs.filter((blog) => blog.id !== id));
-        setNotification({
-          type: 'success',
-          message: `Removed ${blogToRemove.title} successfully`,
-        });
-        setTimeout(() => {
-          setNotification(null);
-        }, 5000);
+        dispatch(
+          setNotification({
+            alert: 'success',
+            message: `Removed ${blogToRemove.title} successfully`,
+          })
+        );
       } catch (error) {
         console.error(error);
-        setNotification({ type: 'error', message: error.response.data.error });
-        setTimeout(() => {
-          setNotification(null);
-        }, 5000);
+        dispatch(
+          setNotification({
+            alert: 'error',
+            message: error.response.data.error,
+          })
+        );
       }
     }
   };
