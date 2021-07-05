@@ -50,4 +50,27 @@ describe('blogReducer', () => {
     expect(newState).toHaveLength(2);
     expect(newState).toContainEqual(action.blog);
   });
+
+  test('should add 1 to likes property to blog', () => {
+    const [toLike] = initialState;
+    const action = {
+      type: 'LIKE_BLOG',
+      updatedBlog: { ...toLike, likes: toLike.likes + 1 },
+    };
+    const state = initialState;
+    deepFreeze(state);
+    const newState = blogReducer(state, action);
+    expect(newState).toEqual([action.updatedBlog]);
+  });
+
+  test('should remove to blog from state', () => {
+    const action = {
+      type: 'REMOVE_BLOG',
+      id: '1',
+    };
+    const state = initialState;
+    deepFreeze(state);
+    const newState = blogReducer(state, action);
+    expect(newState).toEqual([]);
+  });
 });

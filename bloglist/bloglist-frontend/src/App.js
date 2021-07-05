@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import Blog from './components/Blog';
 import BlogForm from './components/BlogForm';
+import BlogList from './components/BlogList';
 import LoginForm from './components/LoginForm';
 import Notification from './components/Notification';
 import Togglable from './components/Togglable';
@@ -8,12 +8,10 @@ import blogService from './services/blogs';
 import loginService from './services/login';
 import { setNotification } from './reducers/notificationReducer';
 import { initializeBlogs } from './reducers/blogReducer';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 
 const App = () => {
   const dispatch = useDispatch();
-  const blogs = useSelector((state) => state.blogs);
-  const notification = useSelector((state) => state.notification);
 
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -58,29 +56,6 @@ const App = () => {
     }
   };
 
-  // const likeBlog = async (id) => {
-  //   const blogToLike = blogs.find((blog) => blog.id === id);
-  //   const likedBlog = {
-  //     ...blogToLike,
-  //     likes: blogToLike.likes + 1,
-  //     user: blogToLike.user.id,
-  //   };
-
-  //   try {
-  //     await blogService.update(id, likedBlog);
-  //     setBlogs(
-  //       blogs.map((blog) =>
-  //         blog.id !== id ? blog : { ...blogToLike, likes: blogToLike.likes + 1 }
-  //       )
-  //     );
-  //   } catch (error) {
-  //     console.error(error);
-  //     dispatch(
-  //       setNotification({ alert: 'error', message: error.response.data.error })
-  //     );
-  //   }
-  // };
-
   const handleLogout = () => {
     window.localStorage.removeItem('loggedBloglistUser');
     blogService.setToken(null);
@@ -93,38 +68,11 @@ const App = () => {
     );
   };
 
-  // const removeBlog = async (id) => {
-  //   const blogToRemove = blogs.find((blog) => blog.id === id);
-  //   const result = window.confirm(
-  //     `Remove blog ${blogToRemove.title} by ${blogToRemove.author}?`
-  //   );
-  //   if (result) {
-  //     try {
-  //       await blogService.remove(id);
-  //       setBlogs(blogs.filter((blog) => blog.id !== id));
-  //       dispatch(
-  //         setNotification({
-  //           alert: 'success',
-  //           message: `Removed ${blogToRemove.title} successfully`,
-  //         })
-  //       );
-  //     } catch (error) {
-  //       console.error(error);
-  //       dispatch(
-  //         setNotification({
-  //           alert: 'error',
-  //           message: error.response.data.error,
-  //         })
-  //       );
-  //     }
-  //   }
-  // };
-
   if (!user) {
     return (
       <div>
         <h2>log in to application</h2>
-        <Notification notification={notification} />
+        <Notification />
         <LoginForm
           username={username}
           password={password}
@@ -139,7 +87,7 @@ const App = () => {
   return (
     <div>
       <h2>blogs</h2>
-      <Notification notification={notification} />
+      <Notification />
       <p>
         {user.name} logged in
         <button onClick={handleLogout}>logout</button>
@@ -148,17 +96,7 @@ const App = () => {
         <h2>create new</h2>
         <BlogForm toggleForm={() => blogFormRef.current.toggleVisibility()} />
       </Togglable>
-      {blogs
-        .sort((a, b) => b.likes - a.likes)
-        .map((blog) => (
-          <Blog
-            key={blog.id}
-            blog={blog}
-            // likeBlog={() => likeBlog(blog.id)}
-            // removeBlog={() => removeBlog(blog.id)}
-            user={user}
-          />
-        ))}
+      <BlogList user={user} />
     </div>
   );
 };

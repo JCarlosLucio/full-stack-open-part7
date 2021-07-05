@@ -6,6 +6,7 @@ import Blog from './Blog';
 describe('<Blog />', () => {
   let component;
   let likeBlog;
+  let removeBlog;
 
   beforeEach(() => {
     const blog = {
@@ -20,8 +21,11 @@ describe('<Blog />', () => {
     };
 
     likeBlog = jest.fn();
+    removeBlog = jest.fn();
 
-    component = render(<Blog blog={blog} likeBlog={likeBlog} />);
+    component = render(
+      <Blog blog={blog} likeBlog={likeBlog} removeBlog={removeBlog} />
+    );
   });
 
   test('should display title and author but not url or likes', () => {
@@ -42,10 +46,16 @@ describe('<Blog />', () => {
     expect(blogDetails).toHaveTextContent('likes 0');
   });
 
-  test('should fire event handler twice if button is clicked twice', () => {
+  test('should fire like event handler twice if button is clicked twice', () => {
     const likeButton = component.getByText('like');
     fireEvent.click(likeButton);
     fireEvent.click(likeButton);
     expect(likeBlog.mock.calls).toHaveLength(2);
+  });
+
+  test('should fire remove event handler', () => {
+    const removeButton = component.getByText('remove');
+    fireEvent.click(removeButton);
+    expect(removeBlog.mock.calls).toHaveLength(1);
   });
 });
