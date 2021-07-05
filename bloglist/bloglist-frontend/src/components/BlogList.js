@@ -20,17 +20,15 @@ const BlogList = ({ user }) => {
 
   return (
     <React.Fragment>
-      {blogs
-        .sort((a, b) => b.likes - a.likes)
-        .map((blog) => (
-          <Blog
-            key={blog.id}
-            blog={blog}
-            likeBlog={() => like(blog)}
-            removeBlog={() => remove(blog)}
-            user={user}
-          />
-        ))}
+      {blogs.map((blog) => (
+        <Blog
+          key={blog.id}
+          blog={blog}
+          likeBlog={() => like(blog)}
+          removeBlog={() => remove(blog)}
+          user={user}
+        />
+      ))}
     </React.Fragment>
   );
 };

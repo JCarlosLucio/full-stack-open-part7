@@ -1,16 +1,20 @@
 import blogService from '../services/blogs';
 import { setNotification } from './notificationReducer';
 
+const byLikes = (a, b) => b.likes - a.likes;
+
 const blogReducer = (state = [], action) => {
   switch (action.type) {
     case 'INIT_BLOGS':
-      return action.blogs;
+      return action.blogs.sort(byLikes);
     case 'ADD_BLOG':
       return [...state, action.blog];
     case 'LIKE_BLOG':
-      return state.map((blog) =>
-        blog.id !== action.updatedBlog.id ? blog : action.updatedBlog
-      );
+      return state
+        .map((blog) =>
+          blog.id !== action.updatedBlog.id ? blog : action.updatedBlog
+        )
+        .sort(byLikes);
     case 'REMOVE_BLOG':
       return state.filter((blog) => blog.id !== action.id);
 

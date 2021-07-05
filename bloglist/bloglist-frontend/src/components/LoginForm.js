@@ -1,48 +1,36 @@
 import React from 'react';
-import PropTypes from 'prop-types';
+import { useDispatch } from 'react-redux';
+import { useField } from '../hooks';
+import { login } from '../reducers/userReducer';
 
-const LoginForm = ({
-  username,
-  password,
-  setUsername,
-  setPassword,
-  handleLogin,
-}) => {
+const LoginForm = () => {
+  const { reset: resetUsername, ...username } = useField('text');
+  const { reset: resetPassword, ...password } = useField('password');
+
+  const dispatch = useDispatch();
+
+  const handleLogin = (event) => {
+    event.preventDefault();
+    dispatch(login(username.value, password.value));
+    resetUsername();
+    resetPassword();
+  };
+
   return (
     <form onSubmit={handleLogin}>
       <div>
         <label htmlFor="username">username</label>
-        <input
-          type="text"
-          id="username"
-          name="Username"
-          value={username}
-          onChange={({ target }) => setUsername(target.value)}
-        />
+        <input id="username" name="username" {...username} />
       </div>
       <div>
         <label htmlFor="password">password</label>
-        <input
-          type="password"
-          id="password"
-          name="Password"
-          value={password}
-          onChange={({ target }) => setPassword(target.value)}
-        />
+        <input id="password" name="password" {...password} />
       </div>
       <button id="login-button" type="submit">
         login
       </button>
     </form>
   );
-};
-
-LoginForm.propTypes = {
-  username: PropTypes.string.isRequired,
-  password: PropTypes.string.isRequired,
-  setUsername: PropTypes.func.isRequired,
-  setPassword: PropTypes.func.isRequired,
-  handleLogin: PropTypes.func.isRequired,
 };
 
 export default LoginForm;

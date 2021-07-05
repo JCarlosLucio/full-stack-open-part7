@@ -1,61 +1,51 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useDispatch } from 'react-redux';
+import { useField } from '../hooks';
 import { createBlog } from '../reducers/blogReducer';
 import PropTypes from 'prop-types';
 
 const BlogForm = ({ toggleForm }) => {
-  const [title, setTitle] = useState('');
-  const [author, setAuthor] = useState('');
-  const [url, setUrl] = useState('');
+  const { reset: resetTitle, ...title } = useField('text');
+  const { reset: resetAuthor, ...author } = useField('text');
+  const { reset: resetUrl, ...url } = useField('text');
 
   const dispatch = useDispatch();
 
   const addBlog = (event) => {
     event.preventDefault();
-    const newBlog = { title, author, url };
+    const newBlog = {
+      title: title.value,
+      author: author.value,
+      url: url.value,
+    };
     dispatch(createBlog(newBlog));
-    setTitle('');
-    setAuthor('');
-    setUrl('');
+    resetTitle();
+    resetAuthor();
+    resetUrl();
     toggleForm();
   };
 
   return (
-    <form onSubmit={addBlog}>
-      <div>
-        <label htmlFor="title">title:</label>
-        <input
-          type="text"
-          id="title"
-          name="title"
-          value={title}
-          onChange={({ target }) => setTitle(target.value)}
-        />
-      </div>
-      <div>
-        <label htmlFor="author">author:</label>
-        <input
-          type="text"
-          id="author"
-          name="author"
-          value={author}
-          onChange={({ target }) => setAuthor(target.value)}
-        />
-      </div>
-      <div>
-        <label htmlFor="url">url:</label>
-        <input
-          type="text"
-          id="url"
-          name="url"
-          value={url}
-          onChange={({ target }) => setUrl(target.value)}
-        />
-      </div>
-      <button id="create-blog-button" type="submit">
-        create
-      </button>
-    </form>
+    <React.Fragment>
+      <h2>create new</h2>
+      <form onSubmit={addBlog}>
+        <div>
+          <label htmlFor="title">title:</label>
+          <input id="title" name="title" {...title} />
+        </div>
+        <div>
+          <label htmlFor="author">author:</label>
+          <input id="author" name="author" {...author} />
+        </div>
+        <div>
+          <label htmlFor="url">url:</label>
+          <input id="url" name="url" {...url} />
+        </div>
+        <button id="create-blog-button" type="submit">
+          create
+        </button>
+      </form>
+    </React.Fragment>
   );
 };
 
