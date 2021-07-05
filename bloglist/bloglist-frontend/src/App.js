@@ -7,20 +7,21 @@ import Togglable from './components/Togglable';
 import blogService from './services/blogs';
 import loginService from './services/login';
 import { setNotification } from './reducers/notificationReducer';
+import { initializeBlogs } from './reducers/blogReducer';
 import { useDispatch, useSelector } from 'react-redux';
 
 const App = () => {
-  const [blogs, setBlogs] = useState([]);
+  const dispatch = useDispatch();
+  const blogs = useSelector((state) => state.blogs);
+  const notification = useSelector((state) => state.notification);
+
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [user, setUser] = useState(null);
   const blogFormRef = useRef();
 
-  const notification = useSelector((state) => state.notification);
-  const dispatch = useDispatch();
-
   useEffect(() => {
-    blogService.getAll().then((blogs) => setBlogs(blogs));
+    dispatch(initializeBlogs());
   }, []);
 
   useEffect(() => {
@@ -57,47 +58,28 @@ const App = () => {
     }
   };
 
-  const addBlog = async (blogObject) => {
-    try {
-      const savedBlog = await blogService.create(blogObject);
-      setBlogs([...blogs, savedBlog]);
-      blogFormRef.current.toggleVisibility();
-      dispatch(
-        setNotification({
-          alert: 'success',
-          message: `a new blog ${blogObject.title} by ${blogObject.author} added`,
-        })
-      );
-    } catch (error) {
-      console.error(error);
-      dispatch(
-        setNotification({ alert: 'error', message: error.response.data.error })
-      );
-    }
-  };
+  // const likeBlog = async (id) => {
+  //   const blogToLike = blogs.find((blog) => blog.id === id);
+  //   const likedBlog = {
+  //     ...blogToLike,
+  //     likes: blogToLike.likes + 1,
+  //     user: blogToLike.user.id,
+  //   };
 
-  const likeBlog = async (id) => {
-    const blogToLike = blogs.find((blog) => blog.id === id);
-    const likedBlog = {
-      ...blogToLike,
-      likes: blogToLike.likes + 1,
-      user: blogToLike.user.id,
-    };
-
-    try {
-      await blogService.update(id, likedBlog);
-      setBlogs(
-        blogs.map((blog) =>
-          blog.id !== id ? blog : { ...blogToLike, likes: blogToLike.likes + 1 }
-        )
-      );
-    } catch (error) {
-      console.error(error);
-      dispatch(
-        setNotification({ alert: 'error', message: error.response.data.error })
-      );
-    }
-  };
+  //   try {
+  //     await blogService.update(id, likedBlog);
+  //     setBlogs(
+  //       blogs.map((blog) =>
+  //         blog.id !== id ? blog : { ...blogToLike, likes: blogToLike.likes + 1 }
+  //       )
+  //     );
+  //   } catch (error) {
+  //     console.error(error);
+  //     dispatch(
+  //       setNotification({ alert: 'error', message: error.response.data.error })
+  //     );
+  //   }
+  // };
 
   const handleLogout = () => {
     window.localStorage.removeItem('loggedBloglistUser');
@@ -111,32 +93,32 @@ const App = () => {
     );
   };
 
-  const removeBlog = async (id) => {
-    const blogToRemove = blogs.find((blog) => blog.id === id);
-    const result = window.confirm(
-      `Remove blog ${blogToRemove.title} by ${blogToRemove.author}?`
-    );
-    if (result) {
-      try {
-        await blogService.remove(id);
-        setBlogs(blogs.filter((blog) => blog.id !== id));
-        dispatch(
-          setNotification({
-            alert: 'success',
-            message: `Removed ${blogToRemove.title} successfully`,
-          })
-        );
-      } catch (error) {
-        console.error(error);
-        dispatch(
-          setNotification({
-            alert: 'error',
-            message: error.response.data.error,
-          })
-        );
-      }
-    }
-  };
+  // const removeBlog = async (id) => {
+  //   const blogToRemove = blogs.find((blog) => blog.id === id);
+  //   const result = window.confirm(
+  //     `Remove blog ${blogToRemove.title} by ${blogToRemove.author}?`
+  //   );
+  //   if (result) {
+  //     try {
+  //       await blogService.remove(id);
+  //       setBlogs(blogs.filter((blog) => blog.id !== id));
+  //       dispatch(
+  //         setNotification({
+  //           alert: 'success',
+  //           message: `Removed ${blogToRemove.title} successfully`,
+  //         })
+  //       );
+  //     } catch (error) {
+  //       console.error(error);
+  //       dispatch(
+  //         setNotification({
+  //           alert: 'error',
+  //           message: error.response.data.error,
+  //         })
+  //       );
+  //     }
+  //   }
+  // };
 
   if (!user) {
     return (
@@ -164,7 +146,7 @@ const App = () => {
       </p>
       <Togglable buttonLabel="create new blog" ref={blogFormRef}>
         <h2>create new</h2>
-        <BlogForm createBlog={addBlog} />
+        <BlogForm toggleForm={() => blogFormRef.current.toggleVisibility()} />
       </Togglable>
       {blogs
         .sort((a, b) => b.likes - a.likes)
@@ -172,8 +154,8 @@ const App = () => {
           <Blog
             key={blog.id}
             blog={blog}
-            likeBlog={() => likeBlog(blog.id)}
-            removeBlog={() => removeBlog(blog.id)}
+            // likeBlog={() => likeBlog(blog.id)}
+            // removeBlog={() => removeBlog(blog.id)}
             user={user}
           />
         ))}

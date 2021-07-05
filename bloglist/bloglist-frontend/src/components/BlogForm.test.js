@@ -1,37 +1,58 @@
 import React from 'react';
 import '@testing-library/jest-dom/extend-expect';
-import { act, fireEvent, render } from '@testing-library/react';
+import { fireEvent, render } from '@testing-library/react';
+import { createStore, applyMiddleware, combineReducers } from 'redux';
+import { composeWithDevTools } from 'redux-devtools-extension';
+import { Provider } from 'react-redux';
+import thunk from 'redux-thunk';
+import blogReducer from '../reducers/blogReducer';
 import BlogForm from './BlogForm';
 
 describe('<BlogForm />', () => {
-  test('should call the form event handler with the right details', async () => {
-    const createBlog = jest.fn();
+  const reducer = combineReducers({
+    blogs: blogReducer,
+  });
 
-    const component = render(<BlogForm createBlog={createBlog} />);
+  const store = createStore(
+    reducer,
+    composeWithDevTools(applyMiddleware(thunk))
+  );
+
+  test('should call the form event handler with the right details', async () => {
+    const toggleForm = jest.fn();
+
+    const component = render(
+      <Provider store={store}>
+        <BlogForm toggleForm={toggleForm} />
+      </Provider>
+    );
 
     const titleInput = component.container.querySelector('#title');
     const authorInput = component.container.querySelector('#author');
     const urlInput = component.container.querySelector('#url');
     const form = component.container.querySelector('form');
 
+    const blogData = {
+      author: 'author for test',
+      title: 'title for test',
+      url: 'url for test',
+    };
+
     fireEvent.change(titleInput, {
-      target: { value: 'title for test' },
+      target: { value: blogData.title },
     });
     fireEvent.change(authorInput, {
-      target: { value: 'author for test' },
+      target: { value: blogData.author },
     });
     fireEvent.change(urlInput, {
-      target: { value: 'url for test' },
+      target: { value: blogData.url },
     });
 
-    // needed to await act cause onSubmit triggers an async function (addBlog)
-    await act(async () => {
-      fireEvent.submit(form);
-    });
+    expect(form).toHaveFormValues(blogData);
 
-    expect(createBlog.mock.calls).toHaveLength(1);
-    expect(createBlog.mock.calls[0][0].title).toBe('title for test');
-    expect(createBlog.mock.calls[0][0].author).toBe('author for test');
-    expect(createBlog.mock.calls[0][0].url).toBe('url for test');
+    fireEvent.submit(form);
+
+    expect(form).toHaveFormValues({ author: '', title: '', url: '' });
+    expect(component.container).toHaveTextContent('create');
   });
 });

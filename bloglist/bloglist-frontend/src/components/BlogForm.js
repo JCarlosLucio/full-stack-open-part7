@@ -1,18 +1,23 @@
 import React, { useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { createBlog } from '../reducers/blogReducer';
 import PropTypes from 'prop-types';
 
-const BlogForm = ({ createBlog }) => {
+const BlogForm = ({ toggleForm }) => {
   const [title, setTitle] = useState('');
   const [author, setAuthor] = useState('');
   const [url, setUrl] = useState('');
 
-  const addBlog = async (event) => {
+  const dispatch = useDispatch();
+
+  const addBlog = (event) => {
     event.preventDefault();
     const newBlog = { title, author, url };
-    await createBlog(newBlog);
+    dispatch(createBlog(newBlog));
     setTitle('');
     setAuthor('');
     setUrl('');
+    toggleForm();
   };
 
   return (
@@ -22,7 +27,7 @@ const BlogForm = ({ createBlog }) => {
         <input
           type="text"
           id="title"
-          name="Title"
+          name="title"
           value={title}
           onChange={({ target }) => setTitle(target.value)}
         />
@@ -32,7 +37,7 @@ const BlogForm = ({ createBlog }) => {
         <input
           type="text"
           id="author"
-          name="Author"
+          name="author"
           value={author}
           onChange={({ target }) => setAuthor(target.value)}
         />
@@ -42,7 +47,7 @@ const BlogForm = ({ createBlog }) => {
         <input
           type="text"
           id="url"
-          name="Url"
+          name="url"
           value={url}
           onChange={({ target }) => setUrl(target.value)}
         />
@@ -55,7 +60,7 @@ const BlogForm = ({ createBlog }) => {
 };
 
 BlogForm.propTypes = {
-  createBlog: PropTypes.func.isRequired,
+  toggleForm: PropTypes.func.isRequired,
 };
 
 export default BlogForm;
