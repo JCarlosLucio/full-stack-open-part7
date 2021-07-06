@@ -1,7 +1,7 @@
 import React from 'react';
 import { useDispatch } from 'react-redux';
 import { useField } from '../hooks';
-import { login } from '../reducers/userReducer';
+import { login } from '../reducers/loginReducer';
 
 const LoginForm = () => {
   const { reset: resetUsername, ...username } = useField('text');
