@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Switch, Route, Link } from 'react-router-dom';
+import Blog from './components/Blog';
 import BlogForm from './components/BlogForm';
 import BlogList from './components/BlogList';
 import LoginForm from './components/LoginForm';
@@ -47,6 +48,9 @@ const App = () => {
       <Switch>
         <Route path="/users/:id">
           <User />
+        </Route>
+        <Route path="/blogs/:id">
+          <Blog />
         </Route>
         <Route path="/users">
           <UserList />

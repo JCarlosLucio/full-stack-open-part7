@@ -1,33 +1,26 @@
 import React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { likeBlog, removeBlog } from '../reducers/blogReducer';
-import Blog from './Blog';
+import { useSelector } from 'react-redux';
+import { Link } from 'react-router-dom';
 
-const BlogList = ({ user }) => {
-  const dispatch = useDispatch();
+const BlogList = () => {
   const blogs = useSelector((state) => state.blogs);
 
-  const like = (blog) => dispatch(likeBlog(blog));
-
-  const remove = (blog) => {
-    const result = window.confirm(
-      `Remove blog ${blog.title} by ${blog.author}?`
-    );
-    if (result) {
-      dispatch(removeBlog(blog));
-    }
+  const style = {
+    paddingTop: 10,
+    paddingLeft: 2,
+    border: 'solid',
+    borderWidth: 1,
+    marginBottom: 5,
   };
 
   return (
     <React.Fragment>
       {blogs.map((blog) => (
-        <Blog
-          key={blog.id}
-          blog={blog}
-          likeBlog={() => like(blog)}
-          removeBlog={() => remove(blog)}
-          user={user}
-        />
+        <div className="blog-item" key={blog.id} style={style}>
+          <Link to={`/blogs/${blog.id}`}>
+            {blog.title} {blog.author}
+          </Link>
+        </div>
       ))}
     </React.Fragment>
   );

@@ -1,56 +1,64 @@
-import React, { useState } from 'react';
-import PropTypes from 'prop-types';
+import React from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { likeBlog, removeBlog } from '../reducers/blogReducer';
+import { useHistory, useParams } from 'react-router-dom';
 
-const Blog = ({ blog, likeBlog, removeBlog, user }) => {
-  const [visible, setVisible] = useState(false);
+const Blog = () => {
+  const { id } = useParams();
+  const history = useHistory();
+  const dispatch = useDispatch();
 
-  const toggleVisibility = () => setVisible(!visible);
+  const blog = useSelector((state) =>
+    state.blogs.find((blog) => blog.id === id)
+  );
+  const user = useSelector((state) => state.user);
 
-  const showDetails = { display: visible ? '' : 'none' };
+  if (!blog || !user) {
+    return null;
+  }
+
+  const like = () => dispatch(likeBlog(blog));
+
+  const remove = () => {
+    const result = window.confirm(
+      `Remove blog ${blog.title} by ${blog.author}?`
+    );
+    if (result) {
+      dispatch(removeBlog(blog));
+      history.push('/');
+    }
+  };
 
   const showWhenOwner = {
     display: user?.username === blog.user.username ? '' : 'none',
   };
 
-  const blogStyle = {
-    paddingTop: 10,
-    paddingLeft: 2,
-    border: 'solid',
-    borderWidth: 1,
-    marginBottom: 5,
-  };
-
   return (
-    <div className="blog" style={blogStyle}>
-      <div>
-        {blog.title} {blog.author}
-        <button className="toggle-view-button" onClick={toggleVisibility}>
-          {visible ? 'hide' : 'view'}
-        </button>
+    <div className="blog">
+      <div className="blog-title">
+        <h2>
+          {blog.title} {blog.author}
+        </h2>
       </div>
-      <div className="blogDetails" style={showDetails}>
-        <div>{blog.url}</div>
+      <div className="blogDetails">
         <div>
-          likes <span className="likes">{blog.likes}</span>
-          <button className="like-button" onClick={likeBlog}>
+          <a href={blog.url}>{blog.url}</a>
+        </div>
+        <div>
+          <span className="likes">{blog.likes}</span> likes
+          <button className="like-button" onClick={like}>
             like
           </button>
         </div>
-        <div>{blog.user.name}</div>
+        <div>added by {blog.user.name}</div>
         <div style={showWhenOwner}>
-          <button className="remove-button" onClick={removeBlog}>
+          <button className="remove-button" onClick={remove}>
             remove
           </button>
         </div>
       </div>
     </div>
   );
-};
-
-Blog.propTypes = {
-  blog: PropTypes.object.isRequired,
-  likeBlog: PropTypes.func.isRequired,
-  removeBlog: PropTypes.func.isRequired,
 };
 
 export default Blog;
