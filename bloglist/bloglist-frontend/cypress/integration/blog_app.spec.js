@@ -104,25 +104,6 @@ describe('Blog app', function () {
         cy.contains('my test blog Cypress').click();
         cy.get('.blog').should('not.contain', '.remove-button');
       });
-
-      // it('Blogs are ordered (descending) by number of likes', function () {
-      //   cy.contains('my test blog Cypress').parent().as('testBlog');
-      //   cy.get('@testBlog').find('.toggle-view-button').click();
-      //   cy.get('@testBlog').find('.like-button').click().wait(200).click();
-
-      //   cy.contains('second blog Cypress').parent().as('secondBlog');
-      //   cy.get('@secondBlog').find('.toggle-view-button').click();
-      //   cy.get('@secondBlog').find('.like-button').click();
-
-      //   cy.wait(200);
-      //   cy.get('span.likes').then(($likes) => {
-      //     const numLikes = [...$likes].map((el) => parseInt(el.innerText, 10));
-      //     cy.wrap(numLikes).should(
-      //       'deep.equal',
-      //       [...numLikes].sort((a, b) => b - a)
-      //     );
-      //   });
-      // });
     });
   });
 });

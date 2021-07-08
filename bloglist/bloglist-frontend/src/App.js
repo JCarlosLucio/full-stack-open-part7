@@ -1,16 +1,17 @@
 import React, { useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Switch, Route, Link } from 'react-router-dom';
+import { Switch, Route } from 'react-router-dom';
 import Blog from './components/Blog';
 import BlogForm from './components/BlogForm';
 import BlogList from './components/BlogList';
 import LoginForm from './components/LoginForm';
+import Menu from './components/Menu';
 import Notification from './components/Notification';
 import User from './components/User';
 import UserList from './components/UserList';
 import Togglable from './components/Togglable';
 import { initializeBlogs } from './reducers/blogReducer';
-import { initializeUser, logout } from './reducers/loginReducer';
+import { initializeUser } from './reducers/loginReducer';
 
 const App = () => {
   const dispatch = useDispatch();
@@ -34,34 +35,30 @@ const App = () => {
 
   return (
     <div>
-      <div>
-        <Link to="/">blogs</Link>
-        <Link to="/users">users</Link>
-      </div>
-      <h2>blogs</h2>
+      <Menu />
+      <h2>blog app</h2>
       <Notification />
-      <p>
-        {user.name} logged in
-        <button onClick={() => dispatch(logout())}>logout</button>
-      </p>
 
       <Switch>
         <Route path="/users/:id">
           <User />
         </Route>
+
         <Route path="/blogs/:id">
           <Blog />
         </Route>
+
         <Route path="/users">
           <UserList />
         </Route>
+
         <Route path="/">
           <Togglable buttonLabel="create new blog" ref={blogFormRef}>
             <BlogForm
               toggleForm={() => blogFormRef.current.toggleVisibility()}
             />
           </Togglable>
-          <BlogList user={user} />
+          <BlogList />
         </Route>
       </Switch>
     </div>
