@@ -4,6 +4,7 @@ import blogReducer from './blogReducer';
 describe('blogReducer', () => {
   const initialState = [
     {
+      comments: [],
       likes: 0,
       title: 'Testing is good',
       author: 'Yoshi',
@@ -32,6 +33,7 @@ describe('blogReducer', () => {
     const action = {
       type: 'ADD_BLOG',
       blog: {
+        comments: [],
         likes: 0,
         title: 'blog to add',
         author: 'Yoshi',
@@ -72,5 +74,34 @@ describe('blogReducer', () => {
     deepFreeze(state);
     const newState = blogReducer(state, action);
     expect(newState).toEqual([]);
+  });
+
+  test('should add a comment to comments', () => {
+    const action = {
+      type: 'ADD_COMMENT',
+      commentedBlog: {
+        comments: [{ content: 'test blog', id: '1' }],
+        likes: 0,
+        title: 'Testing is good',
+        author: 'Yoshi',
+        url: 'http://testblog.dev',
+        user: {
+          username: 'yoshi',
+          name: 'Yoshi Tester',
+          id: '1',
+        },
+        id: '1',
+      },
+    };
+    const state = initialState;
+    deepFreeze(state);
+    const newState = blogReducer(state, action);
+    expect(newState).toContainEqual(action.commentedBlog);
+    expect(newState[0].comments).toHaveLength(
+      initialState[0].comments.length + 1
+    );
+    expect(newState[0].comments).toContainEqual(
+      action.commentedBlog.comments[0]
+    );
   });
 });

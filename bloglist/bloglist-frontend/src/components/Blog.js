@@ -2,6 +2,7 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { likeBlog, removeBlog } from '../reducers/blogReducer';
 import { useHistory, useParams } from 'react-router-dom';
+import CommentForm from './CommentForm';
 
 const Blog = () => {
   const { id } = useParams();
@@ -11,7 +12,7 @@ const Blog = () => {
   const blog = useSelector((state) =>
     state.blogs.find((blog) => blog.id === id)
   );
-  console.log('blog', blog);
+
   const user = useSelector((state) => state.user);
 
   if (!blog || !user) {
@@ -59,6 +60,7 @@ const Blog = () => {
         </div>
         <div>
           <h3>comments</h3>
+          <CommentForm blog={blog} />
           <ul>
             {blog.comments.map((comment) => (
               <li key={comment.id}>{comment.content}</li>

@@ -104,6 +104,13 @@ describe('Blog app', function () {
         cy.contains('my test blog Cypress').click();
         cy.get('.blog').should('not.contain', '.remove-button');
       });
+
+      it('A blog can be commented', function () {
+        cy.contains('my test blog Cypress').click();
+        cy.get('#content').type('a test comment');
+        cy.get('#add-comment-button').click();
+        cy.contains('a test comment');
+      });
     });
   });
 });

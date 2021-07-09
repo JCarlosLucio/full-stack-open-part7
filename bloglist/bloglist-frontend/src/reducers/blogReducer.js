@@ -17,6 +17,10 @@ const blogReducer = (state = [], action) => {
         .sort(byLikes);
     case 'REMOVE_BLOG':
       return state.filter((blog) => blog.id !== action.id);
+    case 'ADD_COMMENT':
+      return state.map((blog) =>
+        blog.id !== action.commentedBlog.id ? blog : action.commentedBlog
+      );
 
     default:
       return state;
@@ -76,6 +80,26 @@ export const removeBlog = (blog) => {
           message: `Removed ${blog.title} successfully`,
         })
       );
+    } catch (error) {
+      console.error(error);
+      dispatch(
+        setNotification({ alert: 'error', message: error.response.data.error })
+      );
+    }
+  };
+};
+
+export const createComment = (blog, content) => {
+  return async (dispatch) => {
+    try {
+      const savedComment = await blogService.createComment(blog.id, {
+        content,
+      });
+      const commentedBlog = {
+        ...blog,
+        comments: [...blog.comments, savedComment],
+      };
+      dispatch({ type: 'ADD_COMMENT', commentedBlog });
     } catch (error) {
       console.error(error);
       dispatch(
