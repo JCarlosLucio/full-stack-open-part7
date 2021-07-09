@@ -1,9 +1,12 @@
 const blogsRouter = require('express').Router();
 const { userExtractor } = require('../utils/middleware');
 const Blog = require('../models/blog');
+const Comment = require('../models/comment');
 
 blogsRouter.get('/', async (request, response) => {
-  const blogs = await Blog.find({}).populate('user', { username: 1, name: 1 });
+  const blogs = await Blog.find({})
+    .populate('user', { username: 1, name: 1 })
+    .populate('comments');
   response.json(blogs);
 });
 
@@ -49,6 +52,25 @@ blogsRouter.delete('/:id', userExtractor, async (request, response) => {
   } else {
     response.status(403).json({ error: 'access denied' });
   }
+});
+
+blogsRouter.post('/:id/comments', userExtractor, async (request, response) => {
+  const { content } = request.body;
+  // find blog to comment
+  const blog = await Blog.findById(request.params.id);
+
+  if (!blog) {
+    return response.status(404).json({ error: 'blog not found' });
+  }
+  // create comment
+  const comment = new Comment({ content });
+  const savedComment = await comment.save();
+
+  // add comment to comments in blog
+  blog.comments = [...blog.comments, savedComment];
+  await blog.save();
+
+  response.status(201).json(savedComment);
 });
 
 module.exports = blogsRouter;

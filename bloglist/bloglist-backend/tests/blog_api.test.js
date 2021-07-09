@@ -167,6 +167,75 @@ describe('when there are initially blogs saved', () => {
       expect(titles).not.toContain(blogToDelete.title);
     });
   });
+
+  describe('adding a comment to a blog', () => {
+    test("should succed with status 201 if there's content", async () => {
+      // login for token
+      const response = await api
+        .post('/api/login')
+        .send({ username: 'test', password: 'test' });
+
+      const token = `Bearer ${response.body.token}`;
+
+      // get list of blogs and Blog to add comment
+      const [blogToComment] = await blogsInDb();
+      const commentsAtStart = blogToComment.comments;
+
+      const newComment = {
+        content: 'my first comment',
+      };
+
+      // post request to add comment and expect status 201
+      await api
+        .post(`/api/blogs/${blogToComment.id}/comments`)
+        .set('Authorization', token)
+        .send(newComment)
+        .expect(201)
+        .expect('Content-Type', /application\/json/);
+
+      // check length of comments has increased by 1 in blogToComment
+      const [blogCommented] = await blogsInDb();
+      const commentsAtEnd = blogCommented.comments;
+
+      expect(commentsAtEnd).toHaveLength(commentsAtStart.length + 1);
+
+      // check that comment is added to comments in blogToComment
+      const contents = commentsAtEnd.map((comment) => comment.content);
+      expect(contents).toContain(newComment.content);
+    });
+
+    test('a comment without content returns 400 Bad Request', async () => {
+      const response = await api
+        .post('/api/login')
+        .send({ username: 'test', password: 'test' });
+
+      const token = `Bearer ${response.body.token}`;
+
+      const [blogToComment] = await blogsInDb();
+
+      const newComment = {};
+
+      await api
+        .post(`/api/blogs/${blogToComment.id}/comments`)
+        .set('Authorization', token)
+        .send(newComment)
+        .expect(400);
+    });
+
+    test('fails if token is missing w/ 401 Unauthorized', async () => {
+      const blogsAtStart = await blogsInDb();
+      const [blogToComment] = blogsAtStart;
+
+      const newComment = {
+        content: 'my unauthorized comment',
+      };
+
+      await api
+        .post(`/api/blogs/${blogToComment.id}/comments`)
+        .send(newComment)
+        .expect(401);
+    });
+  });
 });
 
 // ======== USER TESTS =========

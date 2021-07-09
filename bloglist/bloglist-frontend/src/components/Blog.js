@@ -11,6 +11,7 @@ const Blog = () => {
   const blog = useSelector((state) =>
     state.blogs.find((blog) => blog.id === id)
   );
+  console.log('blog', blog);
   const user = useSelector((state) => state.user);
 
   if (!blog || !user) {
@@ -55,6 +56,14 @@ const Blog = () => {
           <button className="remove-button" onClick={remove}>
             remove
           </button>
+        </div>
+        <div>
+          <h3>comments</h3>
+          <ul>
+            {blog.comments.map((comment) => (
+              <li key={comment.id}>{comment.content}</li>
+            ))}
+          </ul>
         </div>
       </div>
     </div>
