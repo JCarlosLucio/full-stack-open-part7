@@ -12,14 +12,16 @@ import UserList from './components/UserList';
 import Togglable from './components/Togglable';
 import { initializeBlogs } from './reducers/blogReducer';
 import { initializeUser } from './reducers/loginReducer';
-import Container from '@material-ui/core/Container';
+import { Container, Typography } from '@material-ui/core';
 import { makeStyles } from '@material-ui/styles';
 
 const useStyles = makeStyles({
   root: {
     background: '#100723',
-    height: '100vh',
+    minHeight: '100vh',
+    height: '100%',
     color: '#c7c3d2',
+    paddingBottom: '1rem',
     '& h2': {
       margin: '0',
       padding: '1rem 0',
@@ -40,20 +42,16 @@ const App = () => {
   }, []);
 
   if (!user) {
-    return (
-      <Container className={classes.root}>
-        <h2>log in to application</h2>
-        <Notification />
-        <LoginForm />
-      </Container>
-    );
+    return <LoginForm />;
   }
 
   return (
     <div className={classes.root}>
       <Menu />
       <Container>
-        <h2>blog app</h2>
+        <Typography component="h2" variant="h4">
+          blog app
+        </Typography>
         <Notification />
 
         <Switch>

@@ -28,7 +28,7 @@ const Menu = () => {
   const user = useSelector((state) => state.user);
 
   return (
-    <AppBar className={classes.root} position="relative">
+    <AppBar className={classes.root} position="relative" data-testid="menu">
       <Toolbar>
         <Button color="inherit" component={Link} to="/">
           blogs

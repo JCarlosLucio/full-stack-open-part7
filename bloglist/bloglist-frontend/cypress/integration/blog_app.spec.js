@@ -55,7 +55,12 @@ describe('Blog app', function () {
         .should('contain', 'a new blog testTitle by testAuthor added')
         .and('have.css', 'color', 'rgb(0, 128, 0)');
       cy.contains('testTitle testAuthor');
-      cy.get('div.blog-item').should('have.length', 1);
+      cy.get('[data-testid=blog-item]').should('have.length', 1);
+    });
+
+    it('Users page can be visited', function () {
+      cy.get('[data-testid=menu]').contains('users').click();
+      cy.get('[data-testid=users-table]').should('exist');
     });
 
     describe('and several blogs exist', function () {
@@ -79,17 +84,17 @@ describe('Blog app', function () {
 
       it('A blog can be liked', function () {
         cy.contains('my test blog Cypress').click();
-        cy.get('.like-button').click();
-        cy.get('.blog').should('contain', '1 likes');
+        cy.get('[data-testid=like-btn]').click();
+        cy.get('[data-testid=blog]').should('contain', '1 likes');
       });
 
       it('A blog can be removed by user who created it', function () {
         cy.contains('my test blog Cypress').click();
-        cy.get('.remove-button').click();
+        cy.get('[data-testid=remove-btn]').click();
         cy.get('.notification.success')
           .should('contain', 'Removed my test blog successfully')
           .and('have.css', 'color', 'rgb(0, 128, 0)');
-        cy.get('div.blog-item').should('have.length', 2);
+        cy.get('[data-testid=blog-item]').should('have.length', 2);
       });
 
       it("A blog can't be removed by other users", function () {
@@ -102,7 +107,7 @@ describe('Blog app', function () {
         cy.request('POST', 'http://localhost:3003/api/users', otherUser);
         cy.login({ username: 'otherUser', password: '1234' });
         cy.contains('my test blog Cypress').click();
-        cy.get('.blog').should('not.contain', '.remove-button');
+        cy.get('[data-testid=remove-btn]').should('not.exist');
       });
 
       it('A blog can be commented', function () {
@@ -110,6 +115,12 @@ describe('Blog app', function () {
         cy.get('#content').type('a test comment');
         cy.get('#add-comment-button').click();
         cy.contains('a test comment');
+      });
+
+      it('A user can be visited', function () {
+        cy.get('[data-testid=menu]').contains('users').click();
+        cy.get('[data-testid=user-link]').click();
+        cy.get('[data-testid=user-blog]').should('have.length', 3);
       });
     });
   });

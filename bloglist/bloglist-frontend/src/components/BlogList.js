@@ -1,28 +1,50 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
+import { List, ListItem } from '@material-ui/core';
+import { makeStyles } from '@material-ui/styles';
+
+const useStyles = makeStyles({
+  root: {
+    border: '1px solid #2d2553',
+    padding: '0',
+    margin: '1rem 0 0 0',
+  },
+  blogItem: {
+    padding: '1rem',
+    background: '#130e3a',
+    '&:nth-of-type(2n)': {
+      background: '#100723',
+    },
+    '&:hover': {
+      background: 'linear-gradient(90deg, #281B78FF 2%, #130e3a 100%)',
+    },
+    '& a': {
+      color: '#c7c3d2',
+    },
+  },
+});
 
 const BlogList = () => {
+  const classes = useStyles();
+
   const blogs = useSelector((state) => state.blogs);
 
-  const style = {
-    paddingTop: 10,
-    paddingLeft: 2,
-    border: 'solid',
-    borderWidth: 1,
-    marginBottom: 5,
-  };
-
   return (
-    <React.Fragment>
+    <List className={classes.root}>
       {blogs.map((blog) => (
-        <div className="blog-item" key={blog.id} style={style}>
-          <Link to={`/blogs/${blog.id}`}>
-            {blog.title} {blog.author}
-          </Link>
-        </div>
+        <ListItem
+          className={classes.blogItem}
+          key={blog.id}
+          button
+          component={Link}
+          to={`/blogs/${blog.id}`}
+          data-testid="blog-item"
+        >
+          {blog.title} {blog.author}
+        </ListItem>
       ))}
-    </React.Fragment>
+    </List>
   );
 };
 
